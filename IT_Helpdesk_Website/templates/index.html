@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Dashboard | IT Helpdesk{% endblock %}
+{% block page_heading %}Dashboard{% endblock %}
+{% block content %}
+<div class="welcome"><div><span class="pill">OVERVIEW</span><h2>Keep support moving.</h2><p>Track IT issues, assign support, and keep assets in service.</p></div><a class="button" href="{{ url_for('new_ticket') }}">＋ Create ticket</a></div>
+{% if db_error %}<div class="alert"><strong>Database connection/report issue</strong><p>{{ db_error }}</p><p>Check MySQL is running, your database credentials are correct, and the <code>Ticket_Report</code> view exists.</p></div>{% endif %}
+<section class="stats">
+  <article class="stat-card"><div class="stat-label">TOTAL TICKETS</div><div class="stat-number">{{ total }}</div><div class="stat-note">Tickets in the report</div></article>
+  <article class="stat-card"><div class="stat-label">OPEN / PENDING</div><div class="stat-number">{{ open_count }}</div><div class="stat-note">Needs attention</div></article>
+  <article class="stat-card"><div class="stat-label">HIGH PRIORITY</div><div class="stat-number">{{ high_count }}</div><div class="stat-note">High, critical or urgent</div></article>
+</section>
+<section class="panel">
+  <div class="panel-heading"><div><h3>Recent tickets</h3><p>Latest records from your MySQL database</p></div><a class="text-link" href="{{ url_for('tickets') }}">View all →</a></div>
+  {% if tickets %}
+  <div class="table-wrap"><table><thead><tr><th>ID</th><th>Complaint</th><th>Employee</th><th>Technician</th><th>Priority</th><th>Status</th></tr></thead><tbody>
+  {% for t in tickets %}<tr><td class="muted">#{{ t.get('ticket_id','') }}</td><td><strong>{{ t.get('complaint', t.get('title','—')) or '—' }}</strong></td><td>{{ t.get('employee_name','—') or '—' }}</td><td>{{ t.get('technician_name','—') or 'Unassigned' }}</td><td><span class="tag {{ (t.get('priority','')|string|lower)|replace(' ','-') }}">{{ t.get('priority','—') or '—' }}</span></td><td><span class="tag status">{{ t.get('status','—') or '—' }}</span></td></tr>{% endfor %}
+  </tbody></table></div>
+  {% else %}<div class="empty"><div class="empty-icon">▤</div><strong>No ticket records to display</strong><p>Add sample data in MySQL or create a ticket.</p></div>{% endif %}
+</section>
+{% endblock %}
